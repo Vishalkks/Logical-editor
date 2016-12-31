@@ -1,25 +1,85 @@
+var graph = [];		// This array stores objects for all connections made in the graph.
+
+
+/*
+This function creates the div which will hold the images and their connections. 
+*/
 function makeDiv()
 {
 	var theDiv = document.createElement("DIV");
 	theDiv.id = "box";
 	document.body.appendChild(theDiv);
+
 	addImages();
+	
+	reDraw();		//In case of connections from a prior session.
 }
 
+/*
+Draws a connection between all the nodes as specified in the graph
+*/
+function reDraw()
+{
+	var firstInstance = jsPlumb.getInstance();
+	for(i in graph)
+	{	
+		var item = graph[i];
+		var activeSceneID = item['source'];
+		var connectionTo = item['destination'];
+		if (activeSceneID != connectionTo)
+		{
+			firstInstance.connect({
+			  source:activeSceneID, 
+			  target:connectionTo,
+			  anchor:"AutoDefault",
+			  paintStyle:{ stroke:"white", strokeWidth:1 },
+			  connector:[ "Bezier", { curviness:50 } ],
+			     endpoint:[ "Rectangle", { 
+	      				cssClass:"myEndPoint", 
+	      				width:15, 
+	      				height:10}] ,
+			  endpointStyle:{fill: "#EEE" }
+			});
+			
+		}
+	}
+	
+	
+}
+
+
+/*
+Discards the div, all information has already been stored.
+*/
+function hide()
+{
+	document.body.removeChild(document.getElementById("box"));
+}
+
+
+/*
+Called onclick of an image. Creates a connection between active scene image and clicked image.
+Ignores if same image is clicked, no self-loops
+*/
 function connect(evt)
 {
 	imgObj = evt.target;
 	
-	activeSceneID = "img1";
+	randomIndexForPickingRandomActiveScene = parseInt(Math.random()*100) % 5;	//variable names aren't my forte.
+	
+	activeSceneID = "img" + randomIndexForPickingRandomActiveScene;		//This line should be replaced by a call to get ID of active scene's image.
+
 	connectionTo = imgObj.id;
+	var instance = jsPlumb.getInstance();
 	if (activeSceneID != connectionTo)
 	{
-		jsPlumb.connect({
+		graph.push({'source':activeSceneID,'destination':connectionTo});
+		instance.connect({
 		  source:activeSceneID, 
 		  target:connectionTo,
 		  anchor:"AutoDefault",
 		  paintStyle:{ stroke:"white", strokeWidth:1 },
-		  connector:[ "Flowchart", { midpoint:0.5, cornerRadius:10 } ],
+		  connector:[ "Bezier", { curviness:50 } ],
 		     endpoint:[ "Rectangle", { 
       				cssClass:"myEndPoint", 
       				width:15, 
@@ -27,11 +87,13 @@ function connect(evt)
 		  endpointStyle:{fill: "#EEE" }
 		});
 	}
-
+	
 }
 
 
-//Takes a list of image names, and creates image objects and returns an array of images
+/*
+Takes a list of image names, and creates image objects and returns an array of images
+*/
 function createImages(imgNames)
 {
 	images = []
@@ -47,7 +109,9 @@ function createImages(imgNames)
 	return images
 }
 
-
+/*
+Places images in a circular layout; supports any number of images.
+*/
 function addImages()
 {
 	imgNames = ["4.jpg","5.jpg","6.jpg","4.jpg","5.jpg","4.jpg","5.jpg"];		//hardcoded for now; This line should retrieve the list of image names of all scenes
