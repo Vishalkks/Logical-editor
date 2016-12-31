@@ -16,12 +16,18 @@
 
 }
 
-#bottomnav button{
+#but1{
 	position:absolute;
 	bottom: 40%;
 	left:50%
 }
   
+#but{
+	position:absolute;
+	bottom: 40%;
+	left:60%
+
+}
 
 
 #box {
