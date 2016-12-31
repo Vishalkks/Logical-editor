@@ -1,0 +1,40 @@
+*,
+*:before,
+*:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+
+#bottomnav{
+    width:99%;
+    height:50px;
+    background:#111;
+    position:absolute;
+    bottom:0px;
+
+}
+
+#bottomnav button{
+	position:absolute;
+	bottom: 40%;
+	left:50%
+}
+  
+
+
+#box {
+  width: 45%;
+  height: 45%;
+  position: relative;
+  margin:auto;
+  border-radius: 100%;
+}
+#box img {
+  width: 90px;
+  height: 90px;
+  position: absolute;
+  border-radius: 100%;
+  -webkit-transition: all 1s;
+}
