@@ -1,11 +1,7 @@
-
 function makeDiv()
 {
 	var theDiv = document.createElement("DIV");
-	theDiv.id = "theDiv";
-	theDiv.style.width = "100%";		
-	theDiv.style.height = "100%";
-	
+	theDiv.id = "box";
 	document.body.appendChild(theDiv);
 	addImages();
 }
@@ -21,42 +17,62 @@ function connect(evt)
 		jsPlumb.connect({
 		  source:activeSceneID, 
 		  target:connectionTo,
-		  anchors:[ "Right", "Left" ],
+		  anchor:"AutoDefault",
 		  paintStyle:{ stroke:"white", strokeWidth:1 },
-		  endpointStyle:{ fill: "black" }
+		  connector:[ "Flowchart", { midpoint:0.5, cornerRadius:10 } ],
+		     endpoint:[ "Rectangle", { 
+      				cssClass:"myEndPoint", 
+      				width:15, 
+      				height:10}] ,
+		  endpointStyle:{fill: "#EEE" }
 		});
 	}
 
 }
 
 
-function addImages()
+//Takes a list of image names, and creates image objects and returns an array of images
+function createImages(imgNames)
 {
-  div = document.getElementById("theDiv");
-  
-  img1 = new Image(); img1.src = "4.jpg";  img1.id = "img1";
-  img2 = new Image(); img2.src = "5.jpg";  img2.id = "img2";
-  img3 = new Image(); img3.src = "6.jpg";  img3.id = "img3";
-
-  img1.onload = function(){
-  	img1.style = "height:130px;width:130px;position:absolute;left:35%;top:20%;border-radius:15px;";
-  	div.appendChild(img1);
-  	
-  };
-
-  img2.onload = function(){
-        img2.style = "height:130px;width:130px;position:absolute;left:60%;top:30%;border-radius:15px;";
-  	div.appendChild(img2);
-  };
-  
-  img3.onload = function(){
-  	img3.style = "height:130px;width:130px;position:absolute;left:45%;top:50%;border-radius:15px;";
-  	div.appendChild(img3);
-  };
-
-  img1.onclick = connect;
-  img2.onclick = connect;
-  img3.onclick = connect;
+	images = []
+	for(i=0;i<imgNames.length;++i)
+	{
+		img = document.createElement("IMG");
+		img.id = "img"+i;
+		img.src = imgNames[i];
+		img.onclick = connect;
+		images.push(img)
+	}
+	
+	return images
 }
 
 
+function addImages()
+{
+	imgNames = ["4.jpg","5.jpg","6.jpg","4.jpg","5.jpg","4.jpg","5.jpg"];		//hardcoded for now; This line should retrieve the list of image names of all scenes
+	imgs = createImages(imgNames);
+  
+	var circle = document.getElementById('box'),
+	total = imgs.length,
+	coords = {},
+
+	diam = parseInt( window.getComputedStyle(circle).getPropertyValue('width') );
+	var radius = diam/2;
+	var imgW = imgs[0].getBoundingClientRect().width;
+	// get the dimensions of the inner circle we want the images to align to
+	var radius2 = radius - imgW;
+
+	var i,
+	alpha = Math.PI / 2,
+	corner = 2 * Math.PI / total;
+
+	for ( i = 0 ; i < total; i++ )
+	{
+	imgs[i].style.left = parseInt( ( radius - imgW / 2 ) + ( radius2 * Math.cos( alpha ) ) ) + 'px';
+	imgs[i].style.top =  parseInt( ( radius - imgW / 2 ) - ( radius2 * Math.sin( alpha ) ) ) + 'px';
+	circle.appendChild(imgs[i]);
+	alpha = alpha - corner;
+	}  
+	
+}
